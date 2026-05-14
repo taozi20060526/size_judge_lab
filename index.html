@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>实验验证两种编码说关于表象的论证</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="site-header">
+        <div class="site-brand">
+          <div>
+            <div class="site-title">实验验证两种编码说关于表象的论证</div>
+            <div class="site-sub">认知心理学课程程序</div>
+            <div class="site-author">设计者：2025AI班赵钰涛</div>
+          </div>
+        </div>
+      </header>
+
+      <div class="tabs">
+        <button type="button" class="tab active" id="btn-tab-exp">实验</button>
+        <button type="button" class="tab" id="btn-tab-review">材料核对</button>
+        <button type="button" class="tab" id="btn-tab-data">数据</button>
+      </div>
+
+      <div id="screen-welcome" class="card welcome-card">
+        <div class="welcome-hero">
+          <div class="welcome-hero-main">
+            <h1 class="welcome-title-line">实验验证两种编码说关于表象的论证</h1>
+            <p class="welcome-lead welcome-lead--first">
+              欢迎参加我们的认知心理学课程作业实验。屏幕左右将呈现一对刺激，形式为<strong>图像</strong>或<strong>文字</strong>。请您<strong>尽快判断</strong>：在<strong>真实世界</strong>中，哪一侧物体的体积更大。
+            </p>
+            <p class="welcome-lead welcome-keys-row">
+              请用键盘作答：快速按下 <kbd class="kbd-lg" aria-label="左箭头">←</kbd><span class="key-hint">左箭头</span> 表示<strong>左侧</strong>更大；按下 <kbd class="kbd-lg" aria-label="右箭头">→</kbd><span class="key-hint">右箭头</span> 表示<strong>右侧</strong>更大。
+            </p>
+            <p class="welcome-lead">
+              所呈现的<strong>图像大小</strong>或<strong>文字字号</strong>，可能与真实世界中的大小关系<strong>一致</strong>，也可能<strong>不一致</strong>；请尽量<strong>别看屏幕谁大谁小</strong>，按真实世界里谁更大来按键。
+            </p>
+          </div>
+          <aside class="welcome-aside" aria-label="实验概要">
+            <div class="aside-block">
+              <div class="aside-k">正式试次</div>
+              <div class="aside-v">80</div>
+              <div class="aside-hint">＋ 填充 20（文字）</div>
+            </div>
+            <div class="aside-block">
+              <div class="aside-k">总按键</div>
+              <div class="aside-v">100</div>
+              <div class="aside-hint">每 4 正式后 1 次填充</div>
+            </div>
+            <div class="aside-block">
+              <div class="aside-k">条件</div>
+              <div class="aside-v">4</div>
+              <div class="aside-hint">图画/文字 × 一致/不一致</div>
+            </div>
+          </aside>
+        </div>
+
+        <div class="welcome-flow">
+          <h2 class="welcome-h2">流程一览</h2>
+          <ol class="flow-steps">
+            <li><span class="sn">1</span>阅读实验说明</li>
+            <li><span class="sn">2</span>练习（仅图画条件，词对与正式不同）</li>
+            <li><span class="sn">3</span>正式实验（四条件平衡）</li>
+            <li><span class="sn">4</span>第 30、60 个正式试次后各有一次注意力检查（请按 ←）</li>
+          </ol>
+        </div>
+
+        <div class="welcome-foot">
+          <div class="welcome-status">
+            <p id="preload-status" class="progress">准备状态：未开始会话</p>
+            <p id="img-load-hint" class="progress"></p>
+          </div>
+          <div class="btn-row welcome-actions">
+            <button type="button" class="primary btn-start-xl" id="btn-start">开始新会话</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="screen-instruct" class="card hidden">
+        <h2>开始前请读完</h2>
+        <p>练习阶段只有<strong>图画一致 / 图画不一致</strong>，词对与正式不同。达到正确率后可进入正式。</p>
+        <p>正式中，在您完成第 <strong>30</strong> 与第 <strong>60</strong> 个<strong>正式</strong>试次后，会各出现一次<strong>注意力检查</strong>（请按 ←）。</p>
+        <div class="btn-row">
+          <button type="button" class="primary" id="btn-to-practice">开始练习</button>
+        </div>
+      </div>
+
+      <div id="screen-practice" class="card hidden">
+        <h2>练习阶段</h2>
+        <p id="practice-progress" class="progress">准备中…</p>
+        <div id="pr-fix" class="fixation hidden">+</div>
+        <div id="pr-stim" class="stage hidden">
+          <div class="stimulus-row">
+            <div class="stimulus-cell" id="pr-left"></div>
+            <div class="stimulus-cell" id="pr-right"></div>
+          </div>
+          <div class="hint-keys"><kbd>←</kbd> 左更大　<kbd>→</kbd> 右更大</div>
+        </div>
+        <div id="practice-feedback" class="hidden">
+          <p id="practice-summary"></p>
+          <div class="btn-row">
+            <button type="button" id="btn-practice-next">再练一轮</button>
+            <button type="button" class="primary" id="btn-practice-enter">进入正式</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="screen-run" class="card hidden">
+        <h2>实验中</h2>
+        <p id="run-progress" class="progress"></p>
+        <div id="run-fix" class="fixation hidden">+</div>
+        <div id="run-stim" class="stage hidden">
+          <div class="stimulus-row">
+            <div class="stimulus-cell" id="run-left"></div>
+            <div class="stimulus-cell" id="run-right"></div>
+          </div>
+          <div class="hint-keys"><kbd>←</kbd> 左更大　<kbd>→</kbd> 右更大</div>
+        </div>
+      </div>
+
+      <div id="screen-attention" class="card hidden">
+        <h2>注意力检查</h2>
+        <p style="color: #5a7a85; font-size: 17px">请按键盘 <kbd>←</kbd> 左箭头（与当前屏幕内容无关）</p>
+        <p class="hint-keys">也可按 <kbd>→</kbd> 记录为错误（用于筛查）</p>
+      </div>
+
+      <div id="screen-end" class="card hidden">
+        <h2>实验结束</h2>
+        <p class="end-thanks">感谢您的参与。</p>
+        <p id="end-meta"></p>
+        <h3>正式试次 · 各条件汇总（不含超时；不含填充）</h3>
+        <div class="stats-grid" id="end-stats"></div>
+        <div class="btn-row">
+          <button type="button" id="btn-end-home">返回首页</button>
+          <button type="button" class="primary" id="btn-open-data">打开数据页</button>
+        </div>
+      </div>
+
+      <div id="screen-review" class="card hidden review-screen">
+        <div class="review-head">
+          <div>
+            <h2>材料核对</h2>
+            <p class="review-sub">词对与图画呈现参数一览。</p>
+          </div>
+          <button type="button" class="ghost-btn" id="btn-review-refresh">刷新预览</button>
+        </div>
+
+        <section class="review-section">
+          <h3>图画与文字条件参数（一致 / 不一致）</h3>
+          <div id="review-size-rules" class="review-size-rules"></div>
+        </section>
+
+        <section class="review-section">
+          <h3>练习与正式 · 词对与文件名</h3>
+          <div id="review-pair-tables"></div>
+        </section>
+
+        <section class="review-section">
+          <h3>刺激图片一览</h3>
+          <div id="review-stimuli-grid" class="review-stimuli-grid"></div>
+        </section>
+
+        <section class="review-section review-material-footnote" aria-label="材料说明">
+          <p class="review-material-note">
+            预实验里图画用的是简笔画，多名同学反映不好认、表象不好拉起来，经常要先想成词再比真实大小。<br/>正式实验改为实物照片；本页所用图片均由本小组成员挑选、搜集。
+          </p>
+        </section>
+      </div>
+
+      <div id="screen-data" class="card hidden data-screen">
+        <h2>数据与导出</h2>
+        <p class="data-intro">
+          选择会话后可导出试次级 CSV、全部会话汇总 CSV 或单条 JSON。已配置远端数据库时，列表为<strong>远端记录与本机未上传缓存</strong>的合并结果。「删除」仅清除当前浏览器中的本地副本，不删除数据库中的行。
+        </p>
+        <p id="data-cloud-banner" class="data-cloud-banner hidden" role="status" aria-live="polite"></p>
+
+        <div id="data-dashboard" class="data-dashboard"></div>
+
+        <h3 class="data-h3">会话与数据质量</h3>
+        <div id="data-sessions-table" class="data-sessions-table"></div>
+
+        <h3 class="data-h3">选择会话 · 导出与查看</h3>
+        <select id="session-select"></select>
+        <div class="btn-row data-btn-row">
+          <button type="button" class="primary" id="btn-export">导出当前会话 CSV（试次级）</button>
+          <button type="button" id="btn-export-all-summary">导出全部会话汇总 CSV</button>
+          <button type="button" id="btn-json">导出 JSON</button>
+          <button type="button" id="btn-delete">删除当前所选</button>
+        </div>
+
+        <h3 class="data-h3">当前所选会话 · 各条件（正式试次，不含超时与填充）</h3>
+        <div class="stats-grid" id="data-stats"></div>
+
+        <h3 class="data-h3">原始 JSON</h3>
+        <textarea id="session-json" readonly></textarea>
+      </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/remote.js"></script>
+    <script src="js/trials.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/stats.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
