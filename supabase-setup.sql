@@ -1,6 +1,5 @@
--- Supabase：在 SQL Editor 里整段执行一次（新建项目用）。
--- anon 可插可读可改：方便静态页拉列表；数据敏感请自行收紧 RLS / 勿公开 anon key。
--- 若表已存在、仅补权限：只执行文件最末一行 GRANT 即可。
+-- Supabase 建表与 RLS、anon 表级授权（赵钰涛 · 课程作业用）
+-- 新库：整段执行。已有表仅缺权限：只执行最后一行 GRANT 即可。
 
 create table if not exists public.experiment_sessions (
   id uuid primary key default gen_random_uuid(),

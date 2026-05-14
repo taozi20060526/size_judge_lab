@@ -1,5 +1,9 @@
 /**
- * Supabase REST：上传 / 拉取会话（静态托管时用）
+ * 【云端会话同步】赵钰涛
+ *
+ * 通过 Supabase PostgREST 将整段会话 JSON 写入 public.experiment_sessions，并在「数据」页拉取列表。
+ * 依赖 experiment-parameters.js 中的 REMOTE（URL + anon key）；无自建后端，适合 GitHub Pages 静态托管。
+ * 对外：window.SJL_REMOTE = { pushSession, fetchSessions, isRemoteConfigured }。
  */
 (function () {
   const C = window.SJL_CONFIG;
@@ -30,9 +34,7 @@
     return cfg().tableName || "experiment_sessions";
   }
 
-  /**
-   * 整段 session 写入表；session_id 冲突则覆盖 payload。
-   */
+  /** POST 新行；若 session_id 唯一冲突则 PATCH 覆盖 payload。 */
   async function pushSession(session) {
     if (!isRemoteConfigured()) return { ok: false, skipped: true };
     const url = baseUrl() + "/rest/v1/" + tableName();
@@ -66,7 +68,7 @@
     return { ok: true };
   }
 
-  /** 拉取表中 payload 列（需 RLS 允许读，见 SQL） */
+  /** GET 多行，仅使用每行的 payload 字段还原为会话对象。 */
   async function fetchSessions() {
     if (!isRemoteConfigured()) return [];
     const q =

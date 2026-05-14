@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""一次性：按约定顺序将 assets 中的源图复制到 stimuli/ 中文文件名.png"""
+# 赵钰涛：将临时 assets 按顺序重命名为 stimuli/ 下中文文件名（一次性辅助脚本，非实验运行所必需）。
 import os
 import shutil
 

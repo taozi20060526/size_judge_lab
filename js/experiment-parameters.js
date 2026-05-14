@@ -1,6 +1,9 @@
 /**
- * 实验任务参数（刺激、试次、可选远端存储）
- * 图画文件放 stimuli/，文件名与 PAIRS 里 bigFile/smallFile 一致，扩展名见 IMAGE_EXT。
+ * 【实验参数与材料定义】赵钰涛 · 认知心理学课程作业
+ *
+ * 本文件为「单一配置源」：计时、练习/正式词对与文件名、四条件呈现规格、可选 Supabase 连接。
+ * 图画置于 stimuli/，文件名须与 PAIRS / PRACTICE_PAIRS 中 bigFile、smallFile 一致。
+ * 其他脚本只读 window.SJL_CONFIG，不在别处硬编码实验常数。
  */
 window.SJL_CONFIG = {
   STORAGE_KEY: "size_judge_lab_v1",
@@ -78,10 +81,10 @@ window.SJL_CONFIG = {
     { key: "txt_inc", label: "文字-不一致", mode: "text", consistent: false },
   ],
   /**
-   * Supabase：supabaseUrl 填「API 根地址」（形如 https://xxxxx.supabase.co，不要带 /rest）。
-   * 在控制台：左侧 Integrations → Data API → 里找 API URL；或 Project Settings → General。
-   * anon key：Settings → API Keys → Legacy API keys 里的 anon public（或旧版 Settings → API）。
-   * 表结构见 supabase-setup.sql
+   * 远端数据库（Supabase）连接项。
+   * supabaseUrl：项目 API 根地址（https://…supabase.co，勿含 /rest）。
+   * supabaseAnonKey：控制台 API Keys 中 anon public；公开仓库提交前请评估泄露风险。
+   * 建表与权限：见仓库根目录 supabase-setup.sql。
    */
   REMOTE: {
     enabled: true,

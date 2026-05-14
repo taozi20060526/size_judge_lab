@@ -1,6 +1,10 @@
+/**
+ * 【实验界面与流程控制】赵钰涛
+ *
+ * 串联欢迎页 → 指导语 → 练习 → 正式试次 → 注意检查 → 结束；键盘记录 RT；材料核对页与数据页刷新逻辑亦在此。
+ * 依赖前述各 window.SJL_* 模块；本文件不写试次算法、不写持久化细节，只负责交互与状态机。
+ */
 (function () {
-  const C = window.SJL_CONFIG;
-  const T = window.SJL_TRIALS;
   const S = window.SJL_STORAGE;
   const ST = window.SJL_STATS;
   const R = window.SJL_REMOTE;

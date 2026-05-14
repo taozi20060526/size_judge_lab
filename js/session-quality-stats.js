@@ -1,11 +1,17 @@
+/**
+ * 【会话统计与数据质量】赵钰涛
+ *
+ * 按条件聚合正式试次（排除超时与填充）、计算正确率与 RT；并给出「是否跑满主流程」等审核用标记。
+ * 供结束页、数据仪表盘与教师检查表使用。对外：window.SJL_STATS。
+ */
 (function () {
-  const KEYS = ["pic_con", "pic_inc", "txt_con", "txt_inc"];
   const LABEL = {
     pic_con: "图画-一致",
     pic_inc: "图画-不一致",
     txt_con: "文字-一致",
     txt_inc: "文字-不一致",
   };
+  const KEYS = ["pic_con", "pic_inc", "txt_con", "txt_inc"];
 
   function aggregateFormal(session) {
     const trials = (session.main?.trialLog || []).filter(
@@ -31,7 +37,7 @@
     return { byCondition: out, formalN: trials.length };
   }
 
-  /** 是否跑满、注意检查次数、问题说明 */
+  /** 返回主流程试次数、注意检查次数、未完成原因列表（供数据表「待审核」列使用）。 */
   function sessionQuality(session) {
     const main = session.main?.trialLog || [];
     const formal = main.filter((t) => t.phase === "formal");
@@ -64,7 +70,7 @@
     };
   }
 
-  /** 仅合并「完整会话」的正式试次，按条件计算汇总（用于总览） */
+  /** 跨会话元分析：只纳入 sessionQuality 判定为完整的记录，再按四条件池化 RT 与正确率。 */
   function pooledByCondition(sessions) {
     const complete = sessions.filter((s) => sessionQuality(s).isComplete);
     const trials = [];

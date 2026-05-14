@@ -1,3 +1,9 @@
+/**
+ * 【本地存档与数据导出】赵钰涛
+ *
+ * localStorage 存多条会话；提供试次级 CSV、多会话汇总 CSV、单条 JSON 下载；与远端拉取结果在 UI 层合并展示。
+ * 对外：window.SJL_STORAGE。
+ */
 (function () {
   const C = window.SJL_CONFIG;
 
@@ -157,7 +163,7 @@
     return lines.join("\r\n");
   }
 
-  /** 会话总览 CSV 一行一条 */
+  /** 教师用总览：每会话一行，含质量标记与各条件平均 RT（毫秒级列名见表头）。 */
   function buildSessionsOverviewCsv(sessions) {
     const ST = window.SJL_STATS;
     const cols = [
