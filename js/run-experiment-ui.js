@@ -6,7 +6,6 @@
  */
 (function () {
   const C = window.SJL_CONFIG;
-  const T = window.SJL_TRIALS;
   const S = window.SJL_STORAGE;
   const ST = window.SJL_STATS;
   const R = window.SJL_REMOTE;
@@ -380,11 +379,15 @@
       const subIdx =
         Math.abs([...((sessionSeed >>> 0).toString(16))].reduce((a, c) => a + c.charCodeAt(0), 0)) % 4;
 
-      const built = T.buildFormalTrials(sessionSeed, subIdx);
+      const Tr = window.SJL_TRIALS;
+      if (!Tr || typeof Tr.buildFormalTrials !== "function") {
+        throw new Error("试次脚本未就绪：请按 Ctrl+F5 强制刷新，或检查是否拦截了 js/trial-sequence-builder.js");
+      }
+      const built = Tr.buildFormalTrials(sessionSeed, subIdx);
       const formal80 = built.trials;
-      const filler20 = T.buildFillerTrials(sessionSeed);
-      mergedList = T.mergeFormalWithFillers(formal80, filler20);
-      practiceList = T.buildPracticeTrials(sessionSeed);
+      const filler20 = Tr.buildFillerTrials(sessionSeed);
+      mergedList = Tr.mergeFormalWithFillers(formal80, filler20);
+      practiceList = Tr.buildPracticeTrials(sessionSeed);
       practiceIdx = 0;
       practiceRound = 0;
       mainIdx = 0;
@@ -732,7 +735,7 @@
       practiceRound += 1;
       practiceIdx = 0;
       session.practice.trials = [];
-      practiceList = T.buildPracticeTrials((session.meta.sessionSeed + practiceRound * 9973) >>> 0);
+      practiceList = window.SJL_TRIALS.buildPracticeTrials((session.meta.sessionSeed + practiceRound * 9973) >>> 0);
       $("practice-feedback").classList.add("hidden");
       runPracticeLoop();
     };
