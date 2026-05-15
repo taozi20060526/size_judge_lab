@@ -33,9 +33,19 @@
   let keyHandler = null;
   let lastMergedSessions = [];
 
+  function assetRoot() {
+    let p = window.location.pathname || "/";
+    if (p.endsWith("/")) p = p.slice(0, -1) || "/";
+    if (p.endsWith("/index.html")) p = p.slice(0, -"/index.html".length) || "/";
+    if (p.endsWith("/")) p = p.slice(0, -1) || "/";
+    if (p === "/" || p === "") return "";
+    return p;
+  }
+
   function imgUrl(fileBase) {
-    /* 相对 index.html 所在目录；本地与 GitHub Pages（仓库根部署）均无需 BASE_PATH */
-    return `stimuli/${encodeURIComponent(fileBase)}${C.IMAGE_EXT}`;
+    const root = assetRoot();
+    const prefix = root ? root + "/" : "";
+    return `${prefix}stimuli/${encodeURIComponent(fileBase)}${C.IMAGE_EXT}`;
   }
 
   function showScreen(name) {
@@ -186,6 +196,15 @@
     buildReviewStimuliGrid();
   }
 
+  function newSessionId() {
+    try {
+      if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+        return crypto.randomUUID();
+      }
+    } catch (_) {}
+    return "sess_" + Date.now() + "_" + Math.random().toString(36).slice(2, 12);
+  }
+
   function newSubjectId() {
     return `S_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
   }
@@ -205,10 +224,22 @@
     let n = urls.length;
     if (!n) return done(0, 0);
     let ok = 0;
+    let called = false;
+    function allDone() {
+      if (called) return;
+      called = true;
+      done(ok, urls.length - ok);
+    }
+    const safetyMs = 90000;
+    const safety = setTimeout(allDone, safetyMs);
     const tick = () => {
       n--;
-      $("preload-status").textContent = `材料加载中：${urls.length - n}/${urls.length}`;
-      if (n <= 0) done(ok, urls.length - ok);
+      const ps = $("preload-status");
+      if (ps) ps.textContent = `材料加载中：${urls.length - n}/${urls.length}`;
+      if (n <= 0) {
+        clearTimeout(safety);
+        allDone();
+      }
     };
     urls.forEach((url) => {
       const im = new Image();
@@ -341,47 +372,58 @@
   }
 
   function beginSession() {
-    const sessionSeed = (Math.floor(Math.random() * 0xffffffff) ^ Date.now()) >>> 0;
-    const subjectId = newSubjectId();
-    const subIdx =
-      Math.abs([...((sessionSeed >>> 0).toString(16))].reduce((a, c) => a + c.charCodeAt(0), 0)) % 4;
+    try {
+      const sessionSeed = (Math.floor(Math.random() * 0xffffffff) ^ Date.now()) >>> 0;
+      const subjectId = newSubjectId();
+      const subIdx =
+        Math.abs([...((sessionSeed >>> 0).toString(16))].reduce((a, c) => a + c.charCodeAt(0), 0)) % 4;
 
-    const built = T.buildFormalTrials(sessionSeed, subIdx);
-    const formal80 = built.trials;
-    const filler20 = T.buildFillerTrials(sessionSeed);
-    mergedList = T.mergeFormalWithFillers(formal80, filler20);
-    practiceList = T.buildPracticeTrials(sessionSeed);
-    practiceIdx = 0;
-    practiceRound = 0;
-    mainIdx = 0;
-    formalCompleted = 0;
+      const built = T.buildFormalTrials(sessionSeed, subIdx);
+      const formal80 = built.trials;
+      const filler20 = T.buildFillerTrials(sessionSeed);
+      mergedList = T.mergeFormalWithFillers(formal80, filler20);
+      practiceList = T.buildPracticeTrials(sessionSeed);
+      practiceIdx = 0;
+      practiceRound = 0;
+      mainIdx = 0;
+      formalCompleted = 0;
 
-    session = {
-      meta: {
-        sessionId: crypto.randomUUID ? crypto.randomUUID() : `sess_${Date.now()}`,
-        subjectId,
-        sessionSeed,
-        subjectIndexForLatin: subIdx,
-        createdAt: new Date().toISOString(),
-        userAgent: navigator.userAgent,
-        innerW: window.innerWidth,
-        innerH: window.innerHeight,
-        design: { ...built, fillerAfterEvery: 4 },
-      },
-      practice: { trials: [] },
-      main: { trialLog: [] },
-      attention: [],
-    };
+      session = {
+        meta: {
+          sessionId: newSessionId(),
+          subjectId,
+          sessionSeed,
+          subjectIndexForLatin: subIdx,
+          createdAt: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+          innerW: window.innerWidth,
+          innerH: window.innerHeight,
+          design: { ...built, fillerAfterEvery: 4 },
+        },
+        practice: { trials: [] },
+        main: { trialLog: [] },
+        attention: [],
+      };
 
-    const urls = collectImageUrls([...formal80, ...practiceList]);
-    $("preload-status").textContent = "正在加载实验材料…";
-    preloadImages(urls, (loadedOk, failed) => {
-      $("img-load-hint").textContent =
-        failed > 0
-          ? `有 ${failed} 项材料未能加载，对应位置将显示为空白。可在「材料核对」中查看。`
-          : "材料已全部就绪。";
-      showScreen("instruct");
-    });
+      const urls = collectImageUrls([...formal80, ...practiceList]);
+      $("preload-status").textContent = "正在加载实验材料…";
+      preloadImages(urls, (loadedOk, failed) => {
+        $("img-load-hint").textContent =
+          failed > 0
+            ? `有 ${failed} 项材料未能加载，对应位置将显示为空白。可在「材料核对」中查看。`
+            : "材料已全部就绪。";
+        showScreen("instruct");
+      });
+    } catch (e) {
+      console.error(e);
+      const msg = e && e.message ? e.message : String(e);
+      const ps = $("preload-status");
+      if (ps) ps.textContent = "启动失败：" + msg;
+      alert(
+        "无法开始会话（程序异常）。请尝试：① 换用 Chrome / Edge 最新版；② 用带 https 的链接打开；③ 刷新后重试。\n\n若仍失败，请把本提示截图发给主试。\n\n错误：" +
+          msg
+      );
+    }
   }
 
   function runPracticeLoop() {
