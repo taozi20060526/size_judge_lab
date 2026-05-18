@@ -577,7 +577,81 @@
     return { all, remoteError, remoteCount: remote.length };
   }
 
+  function dataAdminCfg() {
+    return C.DATA_ADMIN || {};
+  }
+
+  function isDataAdminUnlocked() {
+    try {
+      return sessionStorage.getItem(dataAdminCfg().unlockFlagKey || "sjl_data_admin_ok_v1") === "1";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function setDataAdminUnlocked(on) {
+    const key = dataAdminCfg().unlockFlagKey || "sjl_data_admin_ok_v1";
+    try {
+      if (on) sessionStorage.setItem(key, "1");
+      else sessionStorage.removeItem(key);
+    } catch (_) {}
+  }
+
+  function updateDataAccessUI() {
+    const gate = $("data-lock-gate");
+    const panel = $("data-admin-content");
+    if (!gate || !panel) return;
+    const ok = isDataAdminUnlocked();
+    gate.classList.toggle("hidden", ok);
+    panel.classList.toggle("hidden", !ok);
+  }
+
+  function openDataTab() {
+    setTabsActive("btn-tab-data");
+    showScreen("data");
+    updateDataAccessUI();
+    if (isDataAdminUnlocked()) void refreshData();
+  }
+
+  function tryUnlockDataAdmin() {
+    const inp = $("data-admin-password");
+    const err = $("data-lock-error");
+    const pwd = (inp && inp.value) || "";
+    const expected = dataAdminCfg().password || "ZYT20060526";
+    if (pwd === expected) {
+      setDataAdminUnlocked(true);
+      if (inp) inp.value = "";
+      if (err) {
+        err.classList.add("hidden");
+        err.textContent = "";
+      }
+      updateDataAccessUI();
+      void refreshData();
+      return true;
+    }
+    if (err) {
+      err.classList.remove("hidden");
+      err.textContent = "密钥不正确，无法查看或导出数据。";
+    }
+    return false;
+  }
+
+  function lockDataAdmin() {
+    setDataAdminUnlocked(false);
+    const inp = $("data-admin-password");
+    if (inp) inp.value = "";
+    const err = $("data-lock-error");
+    if (err) {
+      err.classList.add("hidden");
+      err.textContent = "";
+    }
+    updateDataAccessUI();
+    setTabsActive("btn-tab-exp");
+    showScreen("welcome");
+  }
+
   async function refreshData() {
+    if (!isDataAdminUnlocked()) return;
     const dash = $("data-dashboard");
     const tbl = $("data-sessions-table");
     if (dash) dash.innerHTML = '<p class="dash-empty">加载中…</p>';
@@ -756,11 +830,20 @@
       buildReviewPanel();
       showScreen("review");
     };
-    $("btn-tab-data").onclick = () => {
-      setTabsActive("btn-tab-data");
-      showScreen("data");
-      void refreshData();
+    $("btn-tab-data").onclick = () => openDataTab();
+
+    const pwdInp = $("data-admin-password");
+    if (pwdInp) {
+      pwdInp.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter") tryUnlockDataAdmin();
+      });
+    }
+    $("btn-data-unlock").onclick = () => tryUnlockDataAdmin();
+    $("btn-data-lock-back").onclick = () => {
+      setTabsActive("btn-tab-exp");
+      showScreen("welcome");
     };
+    $("btn-data-lock").onclick = () => lockDataAdmin();
 
     $("btn-review-refresh").onclick = () => buildReviewPanel();
 
@@ -827,8 +910,9 @@
       setTabsActive("btn-tab-exp");
       showScreen("welcome");
     };
-    $("btn-open-data").onclick = () => $("btn-tab-data").click();
+    $("btn-open-data").onclick = () => openDataTab();
   }
 
   wire();
+  updateDataAccessUI();
 })();

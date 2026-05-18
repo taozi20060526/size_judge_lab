@@ -808,6 +808,66 @@ button.ghost-btn:hover {
   max-width: 960px;
 }
 
+/* —— 数据页：主试密钥 —— */
+.data-lock-gate {
+  max-width: 420px;
+  margin: 8px auto 24px;
+  padding: 28px 24px 22px;
+  border-radius: 16px;
+  border: 1px solid rgba(120, 180, 200, 0.4);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow);
+}
+
+.data-lock-hint {
+  font-size: 14px;
+  line-height: 1.65;
+  color: #5a7a85;
+  margin: 0 0 18px;
+}
+
+.data-lock-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2a5560;
+  margin-bottom: 8px;
+}
+
+.data-lock-input {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  font-size: 16px;
+  border: 1px solid rgba(120, 180, 200, 0.5);
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.data-lock-error {
+  font-size: 14px;
+  color: #a04040;
+  margin: 0 0 12px;
+}
+
+.data-lock-actions {
+  margin-top: 8px;
+}
+
+.data-admin-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.data-admin-bar h2 {
+  margin: 0;
+}
+
 /* —— 数据页仪表盘 —— */
 .data-screen h2 {
   font-size: clamp(1.35rem, 3vw, 1.75rem);

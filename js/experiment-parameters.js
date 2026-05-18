@@ -92,4 +92,9 @@ window.SJL_CONFIG = {
     supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvYmFyZGx5cmx6aXVnaXJ0dmJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3Njg1MzgsImV4cCI6MjA5NDM0NDUzOH0.d06Dpm2iIkWBqDGOcE3ya767A0uZo5X8ih3oKsBKvNE",
     tableName: "experiment_sessions",
   },
+  /** 数据页查看/导出：仅主试输入正确密钥后可进入（密钥写在公开网页中，仅作课程作业级防护） */
+  DATA_ADMIN: {
+    password: "ZYT20060526",
+    unlockFlagKey: "sjl_data_admin_ok_v1",
+  },
 };

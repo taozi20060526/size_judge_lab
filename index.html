@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>实验验证两种编码说关于表象的论证</title>
-    <link rel="stylesheet" href="css/style.css?v=2" />
+    <link rel="stylesheet" href="css/style.css?v=3" />
   </head>
   <body>
     <div id="app">
@@ -138,7 +138,7 @@
         <div class="stats-grid" id="end-stats"></div>
         <div class="btn-row">
           <button type="button" id="btn-end-home">返回首页</button>
-          <button type="button" class="primary" id="btn-open-data">打开数据页</button>
+          <button type="button" id="btn-open-data">主试：数据与导出（需密钥）</button>
         </div>
       </div>
 
@@ -174,10 +174,32 @@
       </div>
 
       <div id="screen-data" class="card hidden data-screen">
-        <h2>数据与导出</h2>
-        <p class="data-intro">
-          选择会话后可导出试次级 CSV、全部会话汇总 CSV 或单条 JSON。已配置远端数据库时，列表为<strong>远端记录与本机未上传缓存</strong>的合并结果。「删除」仅清除当前浏览器中的本地副本，不删除数据库中的行。
-        </p>
+        <div id="data-lock-gate" class="data-lock-gate">
+          <h2>数据与导出</h2>
+          <p class="data-lock-hint">本页仅供实验主试查看与导出数据，被试无需进入。</p>
+          <label class="data-lock-label" for="data-admin-password">主试密钥</label>
+          <input
+            type="password"
+            id="data-admin-password"
+            class="data-lock-input"
+            autocomplete="off"
+            placeholder="请输入密钥"
+          />
+          <p id="data-lock-error" class="data-lock-error hidden" role="alert"></p>
+          <div class="btn-row data-lock-actions">
+            <button type="button" class="primary" id="btn-data-unlock">解锁</button>
+            <button type="button" id="btn-data-lock-back">返回实验</button>
+          </div>
+        </div>
+
+        <div id="data-admin-content" class="data-admin-content hidden">
+          <div class="data-admin-bar">
+            <h2>数据与导出</h2>
+            <button type="button" class="ghost-btn" id="btn-data-lock">锁定并退出</button>
+          </div>
+          <p class="data-intro">
+            选择会话后可导出试次级 CSV、全部会话汇总 CSV 或单条 JSON。已配置远端数据库时，列表为<strong>远端记录与本机未上传缓存</strong>的合并结果。「删除」仅清除当前浏览器中的本地副本，不删除数据库中的行。
+          </p>
         <p id="data-cloud-banner" class="data-cloud-banner hidden" role="status" aria-live="polite"></p>
 
         <div id="data-dashboard" class="data-dashboard"></div>
@@ -197,17 +219,18 @@
         <h3 class="data-h3">当前所选会话 · 各条件（正式试次，不含超时与填充）</h3>
         <div class="stats-grid" id="data-stats"></div>
 
-        <h3 class="data-h3">原始 JSON</h3>
-        <textarea id="session-json" readonly></textarea>
+          <h3 class="data-h3">原始 JSON</h3>
+          <textarea id="session-json" readonly></textarea>
+        </div>
       </div>
     </div>
 
     <!-- 脚本加载顺序固定；?v= 仅用于强制浏览器更新缓存，改代码后递增数字 -->
-    <script src="js/experiment-parameters.js?v=2"></script>
-    <script src="js/supabase-session-sync.js?v=2"></script>
-    <script src="js/trial-sequence-builder.js?v=2"></script>
-    <script src="js/session-save-export.js?v=2"></script>
-    <script src="js/session-quality-stats.js?v=2"></script>
-    <script src="js/run-experiment-ui.js?v=2"></script>
+    <script src="js/experiment-parameters.js?v=3"></script>
+    <script src="js/supabase-session-sync.js?v=3"></script>
+    <script src="js/trial-sequence-builder.js?v=3"></script>
+    <script src="js/session-save-export.js?v=3"></script>
+    <script src="js/session-quality-stats.js?v=3"></script>
+    <script src="js/run-experiment-ui.js?v=3"></script>
   </body>
 </html>
